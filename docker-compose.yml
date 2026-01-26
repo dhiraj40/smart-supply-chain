@@ -57,6 +57,56 @@ services:
     volumes:
       - redis-data:/data
 
+  fastapi:
+    build:
+      context: ./backend/api
+    container_name: fastapi
+    ports:
+      - "8000:8000"
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain
+
+  order-consumer:
+    build:
+      context: ./backend/consumers/order_consumer
+    container_name: order_consumer
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain
+
+  analytics-consumer:
+    build:
+      context: ./backend/consumers/analytics_consumer
+    container_name: analytics_consumer
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain
+
+  shipment-consumer:
+    build:
+      context: ./backend/consumers/shipment_consumer
+    container_name: shipment_consumer
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain
+
 volumes:
   zookeeper-data:
   zookeeper-log:
