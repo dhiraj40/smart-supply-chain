@@ -1,0 +1,69 @@
+# ======================
+# OS / Editor
+# ======================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ======================
+# Node.js
+# ======================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+
+# ======================
+# Python
+# ======================
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.env
+
+# ======================
+# Build / Dist
+# ======================
+dist/
+build/
+out/
+
+# ======================
+# Logs
+# ======================
+logs/
+*.log
+
+# ======================
+# Docker
+# ======================
+.env
+docker-compose.override.yml
+
+# ======================
+# Kafka
+# ======================
+kafka-data/
+zookeeper-data/
+
+# ======================
+# Database
+# ======================
+postgres-data/
+redis-data/
+
+# ======================
+# Coverage / Testing
+# ======================
+coverage/
+pytest_cache/
+
+# ======================
+# Misc
+# ======================
+*.swp
+*.swo
