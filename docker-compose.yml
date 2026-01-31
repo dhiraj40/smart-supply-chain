@@ -1,7 +1,6 @@
 version: "3.8"
 
 services:
-
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
@@ -20,19 +19,28 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"
+      - "9092:9092" # Changed: Host 9092 maps to Container 9092 (External Listener)
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      # --- NETWORKING FIX ---
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      
+      # LISTENERS: Bind to 0.0.0.0 (all interfaces), not just localhost
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      
+      # ADVERTISED LISTENERS: What Kafka tells clients to connect to
+      # 1. 'kafka:29092' -> For Docker containers (fastapi, consumers)
+      # 2. 'localhost:9092' -> For your local machine (Terminal, UI tools)
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
 
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     volumes:
       - kafka-data:/var/lib/kafka/data
 
@@ -47,6 +55,7 @@ services:
       POSTGRES_PASSWORD: supplychain_pass
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      # Make sure this path exists on your machine, or remove this line if not needed yet
       - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   redis:
@@ -68,7 +77,8 @@ services:
       - postgres
       - redis
     environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # FIX: Use 'kafka' service name, not 'localhost'
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain
 
   order-consumer:
@@ -80,7 +90,8 @@ services:
       - postgres
       - redis
     environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # FIX: Use 'kafka' service name
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain
 
   analytics-consumer:
@@ -92,7 +103,8 @@ services:
       - postgres
       - redis
     environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # FIX: Use 'kafka' service name
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain
 
   shipment-consumer:
@@ -104,7 +116,8 @@ services:
       - postgres
       - redis
     environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # FIX: Use 'kafka' service name
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain
 
 volumes:

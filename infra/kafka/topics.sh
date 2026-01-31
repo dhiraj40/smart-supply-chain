@@ -12,7 +12,7 @@ docker exec $KAFKA_CONTAINER kafka-topics \
   --bootstrap-server $BOOTSTRAP_SERVER \
   --create \
   --if-not-exists \
-  --topic order.events \
+  --topic orders.events \
   --partitions 3 \
   --replication-factor 1
 
@@ -20,7 +20,7 @@ docker exec $KAFKA_CONTAINER kafka-topics \
   --bootstrap-server $BOOTSTRAP_SERVER \
   --create \
   --if-not-exists \
-  --topic shipment.events \
+  --topic shipments.events \
   --partitions 3 \
   --replication-factor 1
 
