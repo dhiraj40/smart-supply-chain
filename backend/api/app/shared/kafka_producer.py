@@ -2,10 +2,19 @@ import json
 import os
 import time
 from kafka import KafkaProducer
+from ulid import ULID
+from datetime import datetime
 
 KAFKA_BOOTSTRAP_SERVERS = os.getenv(
     "KAFKA_BOOTSTRAP_SERVERS", "kafka:29092"
 )
+
+# TOPICS = {
+#     "ORDER_EVENT": "orders.events",
+#     "SHIPMENT_EVENT": "shipments.events"
+# }
+
+# class Topics:
 ORDER_EVENT = "orders.events"
 SHIPMENT_EVENT = "shipments.events"
 
@@ -16,7 +25,7 @@ def get_kafka_producer():
             print(f"Attempting to connect to Kafka (Attempt {retries+1})...")
             # We use the service name 'kafka' and internal port 29092
             producer = KafkaProducer(
-                bootstrap_servers='kafka:29092',
+                bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
                 value_serializer=lambda v: json.dumps(v, default=str).encode("utf-8")
             )
             print("Successfully connected to Kafka!")
@@ -28,38 +37,48 @@ def get_kafka_producer():
             
     raise Exception("Could not connect to Kafka after multiple retries.")
 
-# def get_producer() -> KafkaProducer:
-#     return KafkaProducer(
-#     bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-#     api_version=(3, 5, 0),   # 🔴 THIS IS THE KEY
-#     value_serializer=lambda v: json.dumps(v).encode("utf-8"),
-#     retries=5,
-#     linger_ms=10
-# )
-
-def send_order_event(
-        event_type: str, 
-        order_id: str,
-        payload: dict
+def send_event(
+    event_topic: str,
+    event: dict
 ):
     producer = get_kafka_producer()
-    event = {
-        "event_id": order_id + "-evt",
-        "event_type": event_type,
-        "payload": payload
-    }
-    # value_encoded = json.dumps(event).encode("utf-8")
-    producer.send(ORDER_EVENT, value=event)
+    producer.send(event_topic, value=event)
     producer.flush()
 
-def send_shipment_event(event_type: str, shipment_id: str, payload: dict):
-    producer = get_kafka_producer()
+def send_order_event(
+    ulid: str,
+    event_type: str,
+    payload: dict
+):
+    order_id = 'ORD-' + ulid
+    event_id = 'EVT-' + ulid
+    payload['order_id'] = order_id
     event = {
-        "event_id": shipment_id + "-evt",
+        "event_id": event_id,
+        "order_id": order_id,
         "event_type": event_type,
+        "event_timestamp": datetime.now(),
         "payload": payload
     }
-    # value_encoded = json.dumps(event).encode("utf-8")
-    producer.send(SHIPMENT_EVENT, value=event)
-    producer.flush()
 
+    send_event(ORDER_EVENT, event)
+    return payload
+
+def send_shipment_event(
+    ulid: str,
+    event_type: str,
+    payload: dict
+):
+    shipment_id = 'SHIP-' + ulid
+    event_id = 'EVT-' + ulid
+    payload['shipment_id'] = shipment_id
+    event = {
+        "event_id": event_id,
+        "shipment_id": shipment_id,
+        "event_type": event_type,
+        "event_timestamp": datetime.now(),
+        "payload": payload
+    }
+
+    send_event(SHIPMENT_EVENT, event)
+    return payload

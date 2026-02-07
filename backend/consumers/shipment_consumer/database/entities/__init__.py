@@ -24,7 +24,7 @@ class OrderEvent(Base):
     event_id = Column(String, primary_key=True, nullable=False)
     order_id = Column(String, index=True, nullable=False)
     event_type = Column(String, nullable=False)
-    event_timestamp = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc), index=True, nullable=False)
+    event_timestamp = Column(DateTime, index=True, nullable=False)
     payload = Column(JSONB, nullable=False)
 
 class Shipment(Base):
@@ -44,7 +44,7 @@ class ShipmentEvent(Base):
     event_id = Column(String, primary_key=True, nullable=False)
     shipment_id = Column(String, index=True, nullable=False)
     event_type = Column(String, nullable=False)
-    event_timestamp = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc), index=True, nullable=False)
+    event_timestamp = Column(DateTime, index=True, nullable=False)
     payload = Column(JSONB, nullable=False)
 
 # class DailyMetric(Base):

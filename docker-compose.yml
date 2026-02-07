@@ -1,4 +1,4 @@
-version: "3.8"
+# version: "3.8"
 
 services:
   zookeeper:
@@ -119,6 +119,19 @@ services:
       # FIX: Use 'kafka' service name
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain
+  
+  frontend-order-app:
+    build: ./frontend/order-app
+    container_name: react-frontend-order-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/order-app:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - fastapi
 
 volumes:
   zookeeper-data:

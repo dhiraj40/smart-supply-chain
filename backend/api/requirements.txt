@@ -6,3 +6,6 @@ aiokafka
 pydantic
 python-dotenv
 kafka-python
+python-ulid
+python-jose
+passlib[bcrypt]

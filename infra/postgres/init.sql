@@ -20,7 +20,7 @@ ON orders(warehouse_id);
 
 -- Order events table
 CREATE TABLE IF NOT EXISTS order_events (
-  event_id        UUID PRIMARY KEY,
+  event_id        VARCHAR PRIMARY KEY,
   order_id        VARCHAR NOT NULL,
   event_type      VARCHAR NOT NULL,
   event_timestamp TIMESTAMP NOT NULL,
@@ -56,7 +56,7 @@ ON shipments(status);
 
 -- Shipment events table
 CREATE TABLE IF NOT EXISTS shipment_events (
-  event_id        UUID PRIMARY KEY,
+  event_id        VARCHAR PRIMARY KEY,
   shipment_id     VARCHAR NOT NULL,
   event_type      VARCHAR NOT NULL,
   event_timestamp TIMESTAMP NOT NULL,
@@ -79,4 +79,10 @@ CREATE TABLE IF NOT EXISTS daily_metrics (
   delayed_shipments        INT,
   avg_delivery_time_hours  NUMERIC(6,2),
   updated_at               TIMESTAMP NOT NULL
+);
+
+-- Error
+CREATE TABLE IF NOT EXISTS daily_metrics (
+  error_msg              VARCHAR,
+  time_stamp               TIMESTAMP NOT NULL
 );

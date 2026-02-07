@@ -1,8 +1,8 @@
 import os
 from time import time
+from datetime import datetime
 import psycopg2
 import json
-from datetime import datetime
 
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:29092")
 POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain")
@@ -23,20 +23,20 @@ def init_db_connection():
             
     raise Exception("Could not connect to Postgres after multiple retries.")
 
-def save_order_event(conn, event):
-    with conn.cursor() as cursor:
-        insert_query = """
-        INSERT INTO order_events (event_id, order_id, event_type, event_timestamp, payload)
-        VALUES (%s, %s, %s, %s, %s)
-        """
-        cursor.execute(insert_query, (
-            event['event_id'],
-            event['order_id'],
-            event['event_type'],
-            event['event_timestamp'],
-            json.dumps(event['payload'])
-        ))
-        conn.commit()
+# def save_order_event(conn, event):
+#     with conn.cursor() as cursor:
+#         insert_query = """
+#         INSERT INTO order_events (event_id, order_id, event_type, event_timestamp, payload)
+#         VALUES (%s, %s, %s, %s, %s)
+#         """
+#         cursor.execute(insert_query, (
+#             event['event_id'],
+#             event['order_id'],
+#             event['event_type'],
+#             event['event_timestamp'],
+#             json.dumps(event['payload'])
+#         ))
+#         conn.commit()
 
 def save_shipment_event(conn, event):
     with conn.cursor() as cursor:
@@ -53,27 +53,27 @@ def save_shipment_event(conn, event):
         ))
         conn.commit()
 
-def save_order(conn, order):
-    with conn.cursor() as cursor:
-        insert_query = """
-        INSERT INTO orders (order_id, customer_id, warehouse_id, status, order_amount, currency, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (order_id) DO UPDATE SET
-            status = EXCLUDED.status,
-            order_amount = EXCLUDED.order_amount,
-            currency = EXCLUDED.currency,
-            updated_at = EXCLUDED.updated_at
-        """
-        cursor.execute(insert_query, (
-            order['order_id'],
-            order['customer_id'],
-            order['warehouse_id'],
-            order['status'],
-            order['order_amount'],
-            order['currency'],
-            order['created_at'],
-            order['updated_at']
-        ))
+# def save_order(conn, order):
+#     with conn.cursor() as cursor:
+#         insert_query = """
+#         INSERT INTO orders (order_id, customer_id, warehouse_id, status, order_amount, currency, created_at, updated_at)
+#         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+#         ON CONFLICT (order_id) DO UPDATE SET
+#             status = EXCLUDED.status,
+#             order_amount = EXCLUDED.order_amount,
+#             currency = EXCLUDED.currency,
+#             updated_at = EXCLUDED.updated_at
+#         """
+#         cursor.execute(insert_query, (
+#             order['order_id'],
+#             order['customer_id'],
+#             order['warehouse_id'],
+#             order['status'],
+#             order['order_amount'],
+#             order['currency'],
+#             order['created_at'],
+#             order['updated_at']
+#         ))
         conn.commit()
 
 def save_shipment(conn, shipment):
@@ -100,6 +100,6 @@ def save_shipment(conn, shipment):
 
 def save_errors(conn, error_message):
     with conn.cursor() as cursor:
-        insert_query = """INSERT INTO exceptions (error_msg, time_stamp) VALUES (%s, NOW())"""
-        cursor.execute(insert_query, (str(error_message),))
+        insert_query = """INSERT INTO exceptions (error_msg, time_stamp) VALUES (%s, %s)"""
+        cursor.execute(insert_query, (str(error_message), str(datetime.now())))
         conn.commit()
