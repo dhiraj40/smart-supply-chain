@@ -38,20 +38,20 @@ def save_order_event(conn, event):
         ))
         conn.commit()
 
-def save_shipment_event(conn, event):
-    with conn.cursor() as cursor:
-        insert_query = """
-        INSERT INTO shipment_events (event_id, shipment_id, event_type, event_timestamp, payload)
-        VALUES (%s, %s, %s, %s, %s)
-        """
-        cursor.execute(insert_query, (
-            event['event_id'],
-            event['shipment_id'],
-            event['event_type'],
-            event['event_timestamp'],
-            json.dumps(event['payload'])
-        ))
-        conn.commit()
+# def save_shipment_event(conn, event):
+#     with conn.cursor() as cursor:
+#         insert_query = """
+#         INSERT INTO shipment_events (event_id, shipment_id, event_type, event_timestamp, payload)
+#         VALUES (%s, %s, %s, %s, %s)
+#         """
+#         cursor.execute(insert_query, (
+#             event['event_id'],
+#             event['shipment_id'],
+#             event['event_type'],
+#             event['event_timestamp'],
+#             json.dumps(event['payload'])
+#         ))
+#         conn.commit()
 
 def save_order(conn, order):
     with conn.cursor() as cursor:
@@ -76,27 +76,57 @@ def save_order(conn, order):
         ))
         conn.commit()
 
-def save_shipment(conn, shipment):
+def update_order(conn, order_id, status):
     with conn.cursor() as cursor:
-        insert_query = """
-        INSERT INTO shipments (shipment_id, order_id, status, current_location, expected_delivery, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (shipment_id) DO UPDATE SET
-            status = EXCLUDED.status,
-            current_location = EXCLUDED.current_location,
-            expected_delivery = EXCLUDED.expected_delivery,
-            updated_at = EXCLUDED.updated_at
+        update_query = """
+        UPDATE orders
+        SET status = %s, updated_at = %s
+        WHERE order_id = %s
         """
-        cursor.execute(insert_query, (
-            shipment['shipment_id'],
-            shipment['order_id'],
-            shipment['status'],
-            shipment['current_location'],
-            shipment['expected_delivery'],
-            shipment['created_at'],
-            shipment['updated_at']
+        cursor.execute(update_query, (
+            status,
+            datetime.now(),
+            order_id
         ))
         conn.commit()
+
+def save_order_items(conn, order_id, ordered_items):
+    with conn.cursor() as cursor:
+        for item in ordered_items:
+            insert_query = """
+            INSERT INTO ordered_items (order_id, item_id, quantity)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (order_id, item_id) DO UPDATE SET
+                quantity = EXCLUDED.quantity
+            """
+            cursor.execute(insert_query, (
+                order_id,
+                item['item_id'],
+                item['quantity']
+            ))
+        conn.commit()
+
+# def save_shipment(conn, shipment):
+#     with conn.cursor() as cursor:
+#         insert_query = """
+#         INSERT INTO shipments (shipment_id, order_id, status, current_location, expected_delivery, created_at, updated_at)
+#         VALUES (%s, %s, %s, %s, %s, %s, %s)
+#         ON CONFLICT (shipment_id) DO UPDATE SET
+#             status = EXCLUDED.status,
+#             current_location = EXCLUDED.current_location,
+#             expected_delivery = EXCLUDED.expected_delivery,
+#             updated_at = EXCLUDED.updated_at
+#         """
+#         cursor.execute(insert_query, (
+#             shipment['shipment_id'],
+#             shipment['order_id'],
+#             shipment['status'],
+#             shipment['current_location'],
+#             shipment['expected_delivery'],
+#             shipment['created_at'],
+#             shipment['updated_at']
+#         ))
+#         conn.commit()
 
 def save_errors(conn, error_message):
     with conn.cursor() as cursor:

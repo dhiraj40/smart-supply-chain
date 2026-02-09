@@ -12,7 +12,7 @@ export async function apiFetch(
         ...headers,
     }
 
-    console.log(body)
+    // console.log(body)
 
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
         method,
@@ -20,7 +20,7 @@ export async function apiFetch(
         body: body ? body : undefined,
     });
 
-    console.log(res)
+    // console.log(res)
 
     // Global auth failure handling
     if (res.status === 401) {

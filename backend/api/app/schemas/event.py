@@ -1,0 +1,5 @@
+class EventTypes:
+    CREATED = "CREATED"
+    UPDATED = "UPDATED"
+    CANCELLED = "CANCELLED"
+    COMPLETED = "COMPLETED"

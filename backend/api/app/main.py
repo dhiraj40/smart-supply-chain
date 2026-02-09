@@ -1,8 +1,10 @@
 from fastapi import FastAPI
-from app.routers import order, shipment
+from fastapi import security
+from app.routers import order, shipment, items
 from app.shared.kafka_producer import get_kafka_producer
 
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordRequestForm
 
 from app.auth.auth import create_access_token
 from app.schemas.auth_model import LoginRequest, TokenResponse
@@ -19,7 +21,7 @@ app = FastAPI(title="Smart Supply Chain API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React app
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # React app
     allow_credentials=True,
     allow_methods=["*"],  # allows OPTIONS, POST, GET, etc.
     allow_headers=["*"],  # allows Content-Type, Authorization
@@ -41,6 +43,7 @@ def shutdown_event():
 # Include routers
 app.include_router(order.router)
 app.include_router(shipment.router)
+app.include_router(items.router)
 
 # Health check endpoint
 @app.get("/health", tags=["Health"])
@@ -54,9 +57,17 @@ def login(data: LoginRequest):
         or data.password != FAKE_USER["password"]
     ):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    # token = create_access_token(data.username)
+    # token = create_access_token(form_data.username)
     token = create_access_token({"sub": data.username})
-    return {"access_token": token}
+    return {"access_token": token, "token_type": "bearer"}
+
+# 1. Create the security INSTANCE
+security_scheme = HTTPBearer()
+
+@app.get("/protected")
+def protected(credentials: HTTPAuthorizationCredentials = Depends(security_scheme)): # <--- USE security
+    token = credentials.credentials  # This contains the actual token string
+    return {"message": "You are authorized!", "token": token}
 
 # Root endpoint
 @app.get("/")

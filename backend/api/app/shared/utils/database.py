@@ -4,6 +4,7 @@ from datetime import datetime
 import psycopg2
 import json
 from psycopg2.extensions import connection
+from psycopg2.extras import RealDictCursor # <--- CRITICAL IMPORT
 
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:29092")
 POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain")
@@ -27,7 +28,7 @@ def getOrders():
     orders = []
     db_conn = init_db_connection()
     query = """SELECT * FROM orders"""
-    with db_conn.cursor() as cursor:
+    with db_conn.cursor(cursor_factory=RealDictCursor) as cursor:
         cursor.execute(query=query)
         orders = cursor.fetchall()
     db_conn.close()
@@ -37,8 +38,18 @@ def getShipments():
     orders = []
     db_conn = init_db_connection()
     query = """SELECT * FROM shipments"""
-    with db_conn.cursor() as cursor:
+    with db_conn.cursor(cursor_factory=RealDictCursor) as cursor:
         cursor.execute(query=query)
         orders = cursor.fetchall()
     db_conn.close()
     return orders
+
+def getItems():
+    items = []
+    db_conn = init_db_connection()
+    query = """SELECT * FROM items"""
+    with db_conn.cursor(cursor_factory=RealDictCursor) as cursor:
+        cursor.execute(query=query)
+        items = cursor.fetchall()
+    db_conn.close()
+    return items

@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "../api/client";
 import { useAuth } from "../auth/AuthProvider";
+import Items from "./Items";
 
-export default function Dashboard() {
+export default function Dashboard(props) {
   const { logout } = useAuth();
-  const [message, setMessage] = useState("");
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { onSelectItem } = props
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await apiFetch("/orders");
-        setMessage(data.message);
+        const data = await apiFetch("/items");
+        console.log(typeof data, data);
+        setItems(JSON.parse(data));
       } catch (err) {
         setError("Failed to load dashboard");
       } finally {
@@ -28,10 +32,8 @@ export default function Dashboard() {
 
   return (
     <div style={styles.container}>
-      <h2>Dashboard</h2>
-
-      <p>{message}</p>
-
+      <h2 className="textA">Dashboard</h2>
+      <Items items={items} onSelectItem={onSelectItem} />
       <button onClick={logout} style={styles.button}>
         Logout
       </button>
@@ -41,8 +43,8 @@ export default function Dashboard() {
 
 const styles = {
   container: {
-    maxWidth: 400,
-    margin: "100px auto",
+    maxWidth: "100%",
+    margin: "10px auto",
     textAlign: "center",
   },
   button: {

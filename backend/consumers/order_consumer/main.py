@@ -3,7 +3,7 @@ import json
 import time
 from kafka import KafkaConsumer
 import database as db
-from database.entities import Order, OrderEvent
+from database.entities import EventTypes
 
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:29092")
 ORDER_EVENT = "orders.events"
@@ -41,9 +41,14 @@ for msg in consumer:
         print(f"Processing msg: {msg.value}")
         order_event = msg.value
         print(f"Processing event: {order_event['event_type']} for {order_event}")
-        if order_event['event_type']=='OrderCreated':
-            db.save_order_event(db_conn, order_event)
+        db.save_order_event(db_conn, order_event)
+        if order_event['event_type']==EventTypes.CREATED:
             db.save_order(db_conn, order_event['payload'])
+            db.save_order_items(db_conn, order_event['payload']['order_id'], order_event['payload']['ordered_items'])
+        elif order_event['event_type']==EventTypes.COMPLETED:
+            db.update_order(db_conn, order_event['payload']['order_id'], status="completed")
+        elif order_event['event_type']==EventTypes.CANCELLED:
+            db.update_order(db_conn, order_event['payload']['order_id'], status="cancelled")
     except Exception as error:
         db.save_errors(db_conn, error)
         print(error)

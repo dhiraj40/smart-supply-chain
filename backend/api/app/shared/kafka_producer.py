@@ -64,6 +64,24 @@ def send_order_event(
     send_event(ORDER_EVENT, event)
     return payload
 
+def send_order_update_event(
+    order_id: str,
+    event_type: str,
+    payload: dict
+):
+    event_id = 'EVT-' + str(ULID())
+    payload['order_id'] = order_id
+    event = {
+        "event_id": event_id,
+        "order_id": order_id,
+        "event_type": event_type,
+        "event_timestamp": datetime.now(),
+        "payload": payload
+    }
+
+    send_event(ORDER_EVENT, event)
+    return payload
+
 def send_shipment_event(
     ulid: str,
     event_type: str,

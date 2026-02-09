@@ -5,6 +5,13 @@ import datetime
 
 
 Base = declarative_base()
+
+class EventTypes:
+    CREATED = "CREATED"
+    UPDATED = "UPDATED"
+    CANCELLED = "CANCELLED"
+    COMPLETED = "COMPLETED"
+
 class Order(Base):
     __tablename__ = "orders"
     
@@ -27,32 +34,27 @@ class OrderEvent(Base):
     event_timestamp = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc), index=True, nullable=False)
     payload = Column(JSONB, nullable=False)
 
-class Shipment(Base):
-    __tablename__ = "shipments"
+class ErrorLog(Base):
+    __tablename__ = "error_logs"
     
-    shipment_id = Column(String, primary_key=True, nullable=False)
-    order_id = Column(String, index=True, nullable=False)
-    status = Column(String, index=True, nullable=False)
-    current_location = Column(String, nullable=True)
-    expected_delivery = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
-    updated_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    error_message = Column(String, nullable=False)
+    stack_trace = Column(String, nullable=True)
+    timestamp = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc), index=True, nullable=False)
 
-class ShipmentEvent(Base):
-    __tablename__ = "shipment_events"
+class Item(Base):
+    __tablename__ = "items"
     
-    event_id = Column(String, primary_key=True, nullable=False)
-    shipment_id = Column(String, index=True, nullable=False)
-    event_type = Column(String, nullable=False)
-    event_timestamp = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc), index=True, nullable=False)
-    payload = Column(JSONB, nullable=False)
+    item_id = Column(String, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    pic_url = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    unit_price = Column(Float, nullable=False, default=0.0)
+    available_quantity = Column(Integer, nullable=False, default=0)
 
-# class DailyMetric(Base):
-#     __tablename__ = "daily_metrics"
+class OrderedItem(Base):
+    __tablename__ = "ordered_items"
     
-#     metric_date = Column(DateTime, primary_key=True, nullable=False)
-#     total_orders = Column(Integer, nullable=False)
-#     delivered_orders = Column(Integer, nullable=False)
-#     delayed_shipments = Column(Integer, nullable=False)
-#     avg_delivery_time_hours = Column(Float, nullable=False)
-#     updated_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
+    order_id = Column(String, primary_key=True, foreign_key="orders.order_id", index=True, nullable=False)
+    item_id = Column(String, primary_key=True, foreign_key="items.item_id", index=True, nullable=False)
+    quantity = Column(Integer, nullable=False)
