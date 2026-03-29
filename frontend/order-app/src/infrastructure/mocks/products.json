@@ -1,0 +1,105 @@
+[
+  {
+    "id": "PROD-101",
+    "slug": "progrip-wireless-scanner-2d",
+    "brand": "ProGrip",
+    "title": "ProGrip Wireless 2D Scanner",
+    "thumbnail": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
+    "price": { "mrp": 150.0, "sellingPrice": 89.99, "currency": "USD" },
+    "rating": { "average": 4.7, "count": 342 },
+    "badges": ["Bestseller"],
+    "description": "Portable scanner for fast warehouse inventory updates."
+  },
+  {
+    "id": "PROD-102",
+    "slug": "zebra-industrial-label-printer-zt231",
+    "brand": "Zebra",
+    "title": "Zebra Industrial Label Printer ZT231",
+    "thumbnail": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=800&q=80",
+    "price": { "mrp": 220.0, "sellingPrice": 149.5, "currency": "USD" },
+    "rating": { "average": 4.5, "count": 228 },
+    "badges": ["Top Rated"],
+    "description": "High-speed thermal printer for shipping and storage labels."
+  },
+  {
+    "id": "PROD-103",
+    "slug": "trackiq-smart-pallet-tracker",
+    "brand": "TrackIQ",
+    "title": "TrackIQ Smart Pallet Tracker",
+    "thumbnail": "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=800&q=80",
+    "price": { "mrp": 99.0, "sellingPrice": 59.0, "currency": "USD" },
+    "rating": { "average": 4.2, "count": 118 },
+    "description": "GPS-enabled tracker for monitoring pallet movement in transit."
+  },
+  {
+    "id": "PROD-104",
+    "slug": "stackpro-heavy-duty-storage-bin",
+    "brand": "StackPro",
+    "title": "StackPro Heavy Duty Storage Bin",
+    "thumbnail": "https://images.unsplash.com/photo-1586880244406-556ebe35f282?auto=format&fit=crop&w=800&q=80",
+    "price": { "mrp": 35.0, "sellingPrice": 24.75, "currency": "USD" },
+    "rating": { "average": 4.3, "count": 205 },
+    "description": "Stackable bin designed for durable bulk component storage."
+  },
+  {
+    "id": "PROD-105",
+    "slug": "forklift-proximity-safety-sensor-kit",
+    "brand": "SafeMove",
+    "title": "Forklift Proximity Safety Sensor Kit",
+    "thumbnail": "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?auto=format&fit=crop&w=800&q=80",
+    "price": { "mrp": 260.0, "sellingPrice": 199.0, "currency": "USD" },
+    "rating": { "average": 4.6, "count": 164 },
+    "badges": ["Bestseller"],
+    "description": "Proximity sensor kit to improve warehouse vehicle awareness."
+  },
+  {
+    "id": "PROD-106",
+    "slug": "skyscan-automated-inventory-drone",
+    "brand": "SkyScan",
+    "title": "SkyScan Automated Inventory Drone",
+    "thumbnail": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
+    "price": { "mrp": 699.99, "sellingPrice": 499.99, "currency": "USD" },
+    "rating": { "average": 4.4, "count": 86 },
+    "description": "Drone system for aerial inventory scanning in large warehouses."
+  },
+  {
+    "id": "PROD-107",
+    "slug": "warehouse-safety-helmet-led",
+    "brand": "SafeGear",
+    "title": "Warehouse Safety Helmet with LED",
+    "thumbnail": "https://images.unsplash.com/photo-1581093588401-9c8b1e5f3c4e?auto=format&fit=crop&w=800&q=80",
+    "price": { "mrp": 55.0, "sellingPrice": 34.99, "currency": "USD" },
+    "rating": { "average": 4.1, "count": 63 },
+    "description": "Durable helmet with built-in LED lights for improved visibility."
+  },
+  {
+    "id": "PROD-108",
+    "slug": "ergo-warehouse-operator-chair",
+    "brand": "ErgoWorks",
+    "title": "ErgoWorks Warehouse Operator Chair",
+    "thumbnail": "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=800&q=80",
+    "price": { "mrp": 179.95, "sellingPrice": 129.95, "currency": "USD" },
+    "rating": { "average": 4.3, "count": 97 },
+    "description": "Comfortable chair designed for long hours of warehouse work."
+  },
+  {
+    "id": "PROD-109",
+    "slug": "heavy-duty-work-gloves-pair",
+    "brand": "GripShield",
+    "title": "Heavy Duty Work Gloves (Pair)",
+    "thumbnail": "https://images.unsplash.com/photo-1581093588401-9c8b1e5f3c4e?auto=format&fit=crop&w=800&q=80",
+    "price": { "mrp": 29.99, "sellingPrice": 19.99, "currency": "USD" },
+    "rating": { "average": 4.0, "count": 54 },
+    "description": "Protective gloves designed for handling rough materials safely."
+  },
+  {
+    "id": "PROD-110",
+    "slug": "warehouse-floor-marking-tape-roll",
+    "brand": "LineSafe",
+    "title": "Warehouse Floor Marking Tape Roll",
+    "thumbnail": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=800&q=80",
+    "price": { "mrp": 21.0, "sellingPrice": 14.5, "currency": "USD" },
+    "rating": { "average": 4.2, "count": 73 },
+    "description": "Durable tape for marking aisles and safety zones in warehouses."
+  }
+]
