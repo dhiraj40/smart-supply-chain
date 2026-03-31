@@ -1,8 +1,6 @@
 import os
-from time import time
-from datetime import datetime
+import time
 import psycopg2
-import json
 from psycopg2.extensions import connection
 from psycopg2.extras import RealDictCursor # <--- CRITICAL IMPORT
 

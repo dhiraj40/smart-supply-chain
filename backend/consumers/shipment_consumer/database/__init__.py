@@ -1,5 +1,5 @@
 import os
-from time import time
+import time
 from datetime import datetime
 import psycopg2
 import json

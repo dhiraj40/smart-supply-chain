@@ -1,15 +1,11 @@
-from fastapi import FastAPI
-from fastapi import security
-from app.routers import order, shipment, items
-from app.shared.kafka_producer import get_kafka_producer
-
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordRequestForm
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.auth.auth import create_access_token
-from app.schemas.auth_model import LoginRequest, TokenResponse
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from app.routers import catalog, order, shipment
+from app.schemas.request.auth import LoginRequest
+from app.schemas.response.auth import TokenResponse
+from app.shared.kafka_producer import get_kafka_producer
 
 # Fake user database (for demo)
 FAKE_USER = {
@@ -41,9 +37,9 @@ def shutdown_event():
     producer.close()
 
 # Include routers
+app.include_router(catalog.router)
 app.include_router(order.router)
 app.include_router(shipment.router)
-app.include_router(items.router)
 
 # Health check endpoint
 @app.get("/health", tags=["Health"])
@@ -60,14 +56,6 @@ def login(data: LoginRequest):
     # token = create_access_token(form_data.username)
     token = create_access_token({"sub": data.username})
     return {"access_token": token, "token_type": "bearer"}
-
-# 1. Create the security INSTANCE
-security_scheme = HTTPBearer()
-
-@app.get("/protected")
-def protected(credentials: HTTPAuthorizationCredentials = Depends(security_scheme)): # <--- USE security
-    token = credentials.credentials  # This contains the actual token string
-    return {"message": "You are authorized!", "token": token}
 
 # Root endpoint
 @app.get("/")
