@@ -50,7 +50,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: supply_chain
+      POSTGRES_DB: supply_chain_v2
       POSTGRES_USER: supplychain_user
       POSTGRES_PASSWORD: supplychain_pass
     volumes:
@@ -79,7 +79,7 @@ services:
     environment:
       # FIX: Use 'kafka' service name, not 'localhost'
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain
+      POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain_v2
 
   order-consumer:
     build:
@@ -92,7 +92,7 @@ services:
     environment:
       # FIX: Use 'kafka' service name
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain
+      POSTGRES_URL: postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain_v2
 
   analytics-consumer:
     build:

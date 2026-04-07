@@ -5,7 +5,7 @@ import StatusBanner from '../components/StatusBanner'
 import { useDashboardController } from '../usecases/useDashboardController'
 
 export default function DashboardPage() {
-  const { dashboard, cart } = useDashboardController()
+  const { dashboard, cart, checkout } = useDashboardController()
   const activeProduct = dashboard.productDetail.detail || dashboard.productDetail.item
   const activeProductQuantity = activeProduct
     ? cart.summary.quantityByItemId[activeProduct.id] || 0
@@ -45,6 +45,7 @@ export default function DashboardPage() {
                   quantities={cart.summary.quantityByItemId}
                   onAdd={cart.addItem}
                   onOpen={dashboard.openProductDetail}
+                  disabled={checkout.isSubmitting}
                 />
               </section>
             )
@@ -58,6 +59,7 @@ export default function DashboardPage() {
         quantity={activeProductQuantity}
         onClose={dashboard.closeProductDetail}
         onAdd={cart.addItem}
+        disabled={checkout.isSubmitting}
       />
     </div>
   )

@@ -2,6 +2,42 @@ import { Button, Card, ListGroup } from 'react-bootstrap'
 import StatusBanner from '../components/StatusBanner'
 import { useCartController } from '../usecases/useCartController'
 
+function getPaymentVariant(status) {
+  if (status === 'failed') {
+    return 'danger'
+  }
+
+  if (status === 'successful') {
+    return 'success'
+  }
+
+  if (status === 'pending' || status === 'starting') {
+    return 'info'
+  }
+
+  return 'secondary'
+}
+
+function getCheckoutButtonLabel(checkout) {
+  if (!checkout.isSubmitting) {
+    return 'Checkout'
+  }
+
+  if (checkout.payment.status === 'starting') {
+    return 'Starting Payment...'
+  }
+
+  if (checkout.payment.status === 'pending') {
+    return 'Checking Payment...'
+  }
+
+  if (checkout.payment.status === 'successful') {
+    return 'Creating Order...'
+  }
+
+  return 'Processing Order...'
+}
+
 export default function CartPage() {
   const { cart, checkout } = useCartController()
   const cartItems = cart.items
@@ -22,13 +58,20 @@ export default function CartPage() {
     <div style={styles.container}>
       <div style={styles.header}>
         <h2 style={{ marginBottom: 0 }}>Your Cart</h2>
-        <Button variant="outline-danger" onClick={cart.clearCart}>
+        <Button
+          variant="outline-danger"
+          onClick={cart.clearCart}
+          disabled={checkout.isSubmitting}
+        >
           Clear Cart
         </Button>
       </div>
 
       <StatusBanner variant="danger">{checkout.error}</StatusBanner>
       <StatusBanner variant="success">{checkout.success}</StatusBanner>
+      <StatusBanner variant={getPaymentVariant(checkout.payment.status)}>
+        {checkout.payment.message}
+      </StatusBanner>
 
       <div style={styles.grid}>
         <Card>
@@ -54,6 +97,7 @@ export default function CartPage() {
                           variant="outline-secondary"
                           size="sm"
                           onClick={() => cart.decreaseItem(item.id)}
+                          disabled={checkout.isSubmitting}
                         >
                           -
                         </Button>
@@ -62,6 +106,7 @@ export default function CartPage() {
                           variant="outline-primary"
                           size="sm"
                           onClick={() => cart.addItem(item)}
+                          disabled={checkout.isSubmitting}
                         >
                           +
                         </Button>
@@ -74,6 +119,7 @@ export default function CartPage() {
                         size="sm"
                         style={styles.removeButton}
                         onClick={() => cart.removeItem(item.id)}
+                        disabled={checkout.isSubmitting}
                       >
                         Remove
                       </Button>
@@ -100,7 +146,7 @@ export default function CartPage() {
             disabled={checkout.isSubmitting || cartItems.length === 0}
             onClick={checkout.submitCheckout}
           >
-            {checkout.isSubmitting ? 'Submitting Order...' : 'Checkout'}
+            {getCheckoutButtonLabel(checkout)}
           </Button>
         </Card>
       </div>

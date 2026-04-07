@@ -13,67 +13,58 @@ from app.shared.utils import database as db
 router = APIRouter(prefix="/orders", tags=["Orders"], dependencies=[Depends(get_current_user)])
 
 
-def build_order_event_payload(order: OrderCreateRequest, current_user: dict) -> dict:
-    customer_id = str(current_user.get("sub") or current_user.get("username") or "order-app-user")
+# def build_order_event_payload(order: OrderCreateRequest, current_user: dict) -> dict:
+#     # user_id = str(current_user.get("sub") or current_user.get("user_id") or "order-app-user")
 
-    return {
-        **order.model_dump(),
-        "customer_id": customer_id,
-        "warehouse_id": "WAR-1",
-        "status": "created",
-        "currency": "USD",
-        "order_amount": order.total_amount,
-        "created_at": order.order_date,
-        "updated_at": datetime.now(timezone.utc),
-        "ordered_items": [
-            {
-                "item_id": item.item_id,
-                "quantity": item.quantity,
-                "unit_price": item.unit_price,
-            }
-            for item in order.items
-        ],
-    }
+#     return order.model_dump()
 
 
-@router.post("", status_code=status.HTTP_202_ACCEPTED, response_model=OrderCreateResponse)
-def create_order(order: OrderCreateRequest, current_user: dict = Depends(get_current_user)):
+@router.post("/create_order", status_code=status.HTTP_202_ACCEPTED, response_model=OrderCreateResponse)
+def create_order(order: OrderCreateRequest, user_id = Depends(get_current_user)):
     ulid = str(ULID())
+    order_data = order.model_dump()
+    order_data["user_id"] = user_id
     published_order = send_order_event(
         ulid,
         EventTypes.CREATED,
-        build_order_event_payload(order, current_user),
+        order_data,
     )
     return OrderCreateResponse(
         order_id=published_order["order_id"],
         status=published_order.get("status", "created"),
     )
 
+@router.get("/")
+def list_orders(user_id = Depends(get_current_user)):
+    return db.getUserOrders(user_id)
 
-@router.get("")
-def get_orders():
-    return db.getOrders()
 
 @router.get("/{order_id}")
-def get_order(order_id: str):
-    return {
-        "order": order_id,
-        "msg": "successfully retrieved."
-    }
-
-@router.delete("/{order_id}")
-def delete_order(order_id: str):
-    send_order_update_event(order_id, EventTypes.CANCELLED, {"order_id": order_id})
-    return {
-        "order": order_id,
-        "msg": "successfully deleted."
-    }
+def get_order_items(order_id: str):
+    return db.getOrderedItems(order_id)
 
 
-@router.post("/completed/{order_id}")
-def complete_order(order_id: str):
-    send_order_update_event(order_id, EventTypes.COMPLETED, {"order_id": order_id})
-    return {
-        "order": order_id,
-        "msg": "successfully completed."
-    }
+
+# @router.get("/{order_id}")
+# def get_order(order_id: str):
+#     return {
+#         "order": order_id,
+#         "msg": "successfully retrieved."
+#     }
+
+# @router.delete("/{order_id}")
+# def delete_order(order_id: str):
+#     send_order_update_event(order_id, EventTypes.CANCELLED, {"order_id": order_id})
+#     return {
+#         "order": order_id,
+#         "msg": "successfully deleted."
+#     }
+
+
+# @router.post("/completed/{order_id}")
+# def complete_order(order_id: str):
+#     send_order_update_event(order_id, EventTypes.COMPLETED, {"order_id": order_id})
+#     return {
+#         "order": order_id,
+#         "msg": "successfully completed."
+#     }

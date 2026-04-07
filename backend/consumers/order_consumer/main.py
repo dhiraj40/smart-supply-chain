@@ -44,13 +44,13 @@ for msg in consumer:
         db.save_order_event(db_conn, order_event)
         if order_event['event_type']==EventTypes.CREATED:
             db.save_order(db_conn, order_event['payload'])
-            db.save_order_items(db_conn, order_event['payload']['order_id'], order_event['payload']['ordered_items'])
+            # db.save_order_items(db_conn, order_event['payload']['order_id'], order_event['payload']['ordered_items'])
         elif order_event['event_type']==EventTypes.COMPLETED:
             db.update_order(db_conn, order_event['payload']['order_id'], status="completed")
         elif order_event['event_type']==EventTypes.CANCELLED:
             db.update_order(db_conn, order_event['payload']['order_id'], status="cancelled")
     except Exception as error:
-        db.save_errors(db_conn, error)
+        # db.save_errors(db_conn, error)
         print(error)
 
 db_conn.close()

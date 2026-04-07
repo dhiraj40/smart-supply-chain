@@ -1,16 +1,9 @@
 import { createRestoreSession } from '../../orchestration/logic/auth/RestoreSession'
 import { createLoginUser } from '../../orchestration/logic/auth/LoginUser'
 import { createLogoutUser } from '../../orchestration/logic/auth/LogoutUser'
-import { createGetCatalogItems } from '../../orchestration/logic/catalog/GetCatalogItems'
-import { createGetProducts } from '../../orchestration/logic/catalog/GetProducts'
-import { createGetProductBySlug } from '../../orchestration/logic/catalog/GetProductBySlug'
-import { createAddItemToCart } from '../../orchestration/logic/cart/AddItemToCart'
-import { createDecreaseCartItem } from '../../orchestration/logic/cart/DecreaseCartItem'
-import { createRemoveCartItem } from '../../orchestration/logic/cart/RemoveCartItem'
-import { createClearCart } from '../../orchestration/logic/cart/ClearCart'
-import { createGetCartSummary } from '../../orchestration/logic/cart/GetCartSummary'
 import { createCreateOrderDraft } from '../../orchestration/logic/checkout/CreateOrderDraft'
-import { createSubmitOrder } from '../../orchestration/logic/checkout/SubmitOrder'
+import { createProcessCheckout } from '../../orchestration/logic/checkout/ProcessCheckout'
+import { createOrderStore } from '../../orchestration/state/usecase/orderStore'
 import { API_BASE_URL } from '../../infrastructure/config/apiConfig'
 import { shouldUseMockRepositories } from '../../infrastructure/config/env'
 import { createHttpClient } from '../../infrastructure/api/httpClient'
@@ -30,11 +23,12 @@ export function createAppContainer() {
     getToken: () => sessionStorage.getToken(),
   })
 
-  const { authRepository, itemRepository, orderRepository } = createRepositories({
-    httpClient,
-    idGenerator,
-    useMocks: shouldUseMocks,
-  })
+  const { authRepository, itemRepository, orderRepository, paymentRepository } =
+    createRepositories({
+      httpClient,
+      idGenerator,
+      useMocks: shouldUseMocks,
+    })
 
   const auth = {
     restoreSession: createRestoreSession({ sessionStorage }),
@@ -43,32 +37,31 @@ export function createAppContainer() {
   }
 
   const catalog = {
-    getCatalogItems: createGetCatalogItems({ itemRepository }),
-    getProducts: createGetProducts({ itemRepository }),
-    getProductBySlug: createGetProductBySlug({ itemRepository }),
+    getHomeLayout() {
+      return itemRepository.getHomeLayout()
+    },
+    getProducts(params) {
+      return itemRepository.getProducts(params)
+    },
+    getProductBySlug(slug) {
+      return itemRepository.getProductBySlug(slug)
+    },
   }
 
-  const cart = {
-    addItemToCart: createAddItemToCart(),
-    decreaseCartItem: createDecreaseCartItem(),
-    removeCartItem: createRemoveCartItem(),
-    clearCart: createClearCart(),
-    getCartSummary: createGetCartSummary(),
-  }
-
+  const createOrderDraft = createCreateOrderDraft({ clock })
+  const orderStore = createOrderStore()
   const checkout = {
-    createOrderDraft: createCreateOrderDraft({ clock }),
+    placeOrder: createProcessCheckout({
+      createOrderDraft,
+      paymentRepository,
+      orderRepository,
+    }),
   }
-
-  checkout.submitOrder = createSubmitOrder({
-    createOrderDraft: checkout.createOrderDraft,
-    orderRepository,
-  })
 
   return {
     auth,
     catalog,
-    cart,
+    orderStore,
     checkout,
   }
 }

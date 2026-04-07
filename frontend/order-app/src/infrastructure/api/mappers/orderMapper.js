@@ -1,13 +1,15 @@
+
 export function mapOrderDraftToDto(orderDraft) {
   return {
+    user_id: orderDraft.userId,
+    order_amount: orderDraft.totalAmount,
+    currency: orderDraft.currency,
+    delivery_address: orderDraft.deliveryAddress,
     order_date: orderDraft.createdAt,
-    total_amount: orderDraft.totalAmount,
     items: orderDraft.items.map((item) => ({
-      item_id: item.itemId,
-      name: item.name,
+      product_id: item.product_id,
       quantity: item.quantity,
       unit_price: item.unitPrice,
-      line_total: item.lineTotal,
     })),
   }
 }

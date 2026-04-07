@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:29092")
-POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain")
+POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://supplychain_user:supplychain_pass@postgres:5432/supply_chain_v2")
 
 
 def init_db_connection():
@@ -28,6 +28,7 @@ def save_order_event(conn, event):
         insert_query = """
         INSERT INTO order_events (event_id, order_id, event_type, event_timestamp, payload)
         VALUES (%s, %s, %s, %s, %s)
+        ON CONFLICT (event_id) DO NOTHING
         """
         cursor.execute(insert_query, (
             event['event_id'],
@@ -56,25 +57,52 @@ def save_order_event(conn, event):
 def save_order(conn, order):
     with conn.cursor() as cursor:
         insert_query = """
-        INSERT INTO orders (order_id, customer_id, warehouse_id, status, order_amount, currency, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (order_id) DO UPDATE SET
-            status = EXCLUDED.status,
-            order_amount = EXCLUDED.order_amount,
-            currency = EXCLUDED.currency,
-            updated_at = EXCLUDED.updated_at
+        INSERT INTO orders (
+            order_id,
+            user_id,
+            order_amount,
+            currency,
+            order_status,
+            delivery_address,
+            created_at
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (order_id) DO NOTHING
         """
         cursor.execute(insert_query, (
             order['order_id'],
-            order['customer_id'],
-            order['warehouse_id'],
-            order['status'],
+            order['user_id'],
             order['order_amount'],
             order['currency'],
-            order['created_at'],
-            order['updated_at']
+            order['order_status'],
+            order['delivery_address'],
+            order['order_date']
         ))
+
+        for item in order['items']:
+            insert_item_query = """
+            INSERT INTO order_items (order_item_id, order_id, product_id, quantity, price, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(insert_item_query, (
+                f'order_item_{order["order_id"]}_{item["product_id"]}',
+                order['order_id'],
+                item['product_id'],
+                item['quantity'],
+                item['unit_price'],
+                order['order_date']
+            ))
         conn.commit()
+
+# def update_order(conn, order_id, status):
+#     with conn.cursor() as cursor:
+#             order['status'],
+#             order['order_amount'],
+#             order['currency'],
+#             order['created_at'],
+#             order['updated_at']
+#         ))
+#         conn.commit()
 
 def update_order(conn, order_id, status):
     with conn.cursor() as cursor:
@@ -90,21 +118,21 @@ def update_order(conn, order_id, status):
         ))
         conn.commit()
 
-def save_order_items(conn, order_id, ordered_items):
-    with conn.cursor() as cursor:
-        for item in ordered_items:
-            insert_query = """
-            INSERT INTO ordered_items (order_id, item_id, quantity)
-            VALUES (%s, %s, %s)
-            ON CONFLICT (order_id, item_id) DO UPDATE SET
-                quantity = EXCLUDED.quantity
-            """
-            cursor.execute(insert_query, (
-                order_id,
-                item['item_id'],
-                item['quantity']
-            ))
-        conn.commit()
+# def save_order_items(conn, order_id, ordered_items):
+#     with conn.cursor() as cursor:
+#         for item in ordered_items:
+#             insert_query = """
+#             INSERT INTO ordered_items (order_id, item_id, quantity)
+#             VALUES (%s, %s, %s)
+#             ON CONFLICT (order_id, item_id) DO UPDATE SET
+#                 quantity = EXCLUDED.quantity
+#             """
+#             cursor.execute(insert_query, (
+#                 order_id,
+#                 item['item_id'],
+#                 item['quantity']
+#             ))
+#         conn.commit()
 
 # def save_shipment(conn, shipment):
 #     with conn.cursor() as cursor:

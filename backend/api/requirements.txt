@@ -9,3 +9,4 @@ kafka-python
 python-ulid
 python-jose
 passlib[bcrypt]
+passlib[argon2]

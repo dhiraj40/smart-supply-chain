@@ -1,0 +1,22 @@
+{
+  "layout": [
+    {
+      "widgetId": "hero_banner_1",
+      "type": "HeroCarousel",
+      "data": {
+        "images": [
+          {
+            "desktopUrl": "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1800&q=80",
+            "mobileUrl": "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=900&q=80",
+            "link": "/category/warehouse-equipment"
+          },
+          {
+            "desktopUrl": "https://images.unsplash.com/photo-1586528116493-0589f5f1b683?auto=format&fit=crop&w=1800&q=80",
+            "mobileUrl": "https://images.unsplash.com/photo-1586528116493-0589f5f1b683?auto=format&fit=crop&w=900&q=80",
+            "link": "/category/scanners"
+          }
+        ]
+      }
+    }
+  ]
+}
