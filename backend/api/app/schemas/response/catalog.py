@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class ProductSummaryResponse(BaseModel):
@@ -7,8 +8,8 @@ class ProductSummaryResponse(BaseModel):
     slug: str
     brand: str
     product_name: str
-    description: str
-    thumbnail_url: str
+    description: Optional[str] = None
+    thumbnail_url: Optional[str] = None
     vendor_id: str
     mrp: float
     selling_price: float
@@ -18,6 +19,7 @@ class ProductSummaryResponse(BaseModel):
     rating_count: int = 0
     is_available: bool
     stock: int
+    product_details: Optional[str] = None
 
 
 class ProductImageResponse(BaseModel):

@@ -9,3 +9,4 @@ class TokenResponse(BaseModel):
 class LoginResponse(BaseModel):
     message: str
     user_profile: UserProfileResponse
+    

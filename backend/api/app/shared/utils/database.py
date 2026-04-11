@@ -129,10 +129,11 @@ def getUserOrderedItems(user_id: str):
     db_conn.close()
     return ordered_items
 
-def getProducts():
+def getProducts(page: int = 1, page_size: int= 100):
+    offset = (page - 1)*page_size
     products = []
     db_conn = init_db_connection()
-    query = """SELECT * FROM products"""
+    query = f"""SELECT * FROM products OFFSET {offset} LIMIT {page_size}"""
     with db_conn.cursor(cursor_factory=RealDictCursor) as cursor:
         cursor.execute(query=query)
         products = cursor.fetchall()

@@ -24,6 +24,7 @@ __pycache__/
 .venv/
 venv/
 .env
+.venv_*/
 
 # ======================
 # Build / Dist
@@ -67,3 +68,4 @@ pytest_cache/
 # ======================
 *.swp
 *.swo
+mock_dataset

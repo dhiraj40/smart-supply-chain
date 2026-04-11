@@ -18,9 +18,12 @@ router = APIRouter(
 # def get_home():
 #     return get_home_layout()
 
-@router.get("/", response_model=List[ProductSummaryResponse])
-def list_products():
-    products = db.getProducts()
+@router.get("/page={page}&page_size={page_size}", response_model=List[ProductSummaryResponse])
+def list_products(page: int, page_size: int):
+    products = db.getProducts(
+        page = page,
+        page_size=page_size
+    )
     product_summaries = [
         ProductSummaryResponse(
             product_id=prod["product_id"],
@@ -37,7 +40,8 @@ def list_products():
             rating_average=prod.get("rating_average", 0.0),
             rating_count=prod.get("rating_count", 0),
             is_available=prod["is_available"],
-            stock=prod["stock"]
+            stock=prod["stock"],
+            product_details=prod['product_details']
         )
         for prod in products
     ]
