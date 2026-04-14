@@ -1,7 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import Optional
-
+from typing import Optional, List
 
 class ProductSummaryResponse(BaseModel):
     product_id: str
@@ -20,6 +19,10 @@ class ProductSummaryResponse(BaseModel):
     is_available: bool
     stock: int
     product_details: Optional[str] = None
+
+class ListProductsResponse(BaseModel):
+    products: List[ProductSummaryResponse]
+    totalCount: int
 
 
 class ProductImageResponse(BaseModel):

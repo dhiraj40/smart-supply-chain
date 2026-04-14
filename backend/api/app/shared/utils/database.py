@@ -140,6 +140,16 @@ def getProducts(page: int = 1, page_size: int= 100):
     db_conn.close()
     return products
 
+def getTotalProductCount():
+    total_count = 0
+    db_conn = init_db_connection()
+    query = f"""SELECT COUNT(*) as total_count FROM products"""
+    with db_conn.cursor(cursor_factory=RealDictCursor) as cursor:
+        cursor.execute(query=query)
+        total_count = cursor.fetchone().get('total_count', 0)
+    db_conn.close()
+    return total_count
+
 def getProductBySlug(slug: str):
     product = None
     db_conn = init_db_connection()

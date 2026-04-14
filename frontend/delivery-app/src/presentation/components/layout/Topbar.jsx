@@ -1,6 +1,6 @@
 import React from 'react'
 import { Navbar, Container, Nav } from 'react-bootstrap'
-import '../../../theme/theme.css'
+import '../../theme/theme.css'
 
 export default function Topbar({ brand = 'Order App', children , right}) {
   return (

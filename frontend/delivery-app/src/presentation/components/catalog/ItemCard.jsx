@@ -8,11 +8,11 @@ export default function ItemCard({
   onOpen,
   disabled = false,
 }) {
-  const [imageStatus, setImageStatus] = useState(item.imageUrl ? 'loading' : 'empty')
+  const [imageStatus, setImageStatus] = useState(item.thumbnail_url ? 'loading' : 'empty')
 
   useEffect(() => {
-    setImageStatus(item.imageUrl ? 'loading' : 'empty')
-  }, [item.imageUrl])
+    setImageStatus(item.thumbnail_url ? 'loading' : 'empty')
+  }, [item.thumbnail_url])
 
   function handleOpen() {
     if (onOpen) {
@@ -46,14 +46,14 @@ export default function ItemCard({
       onKeyDown={handleCardKeyDown}
       role={onOpen ? 'button' : undefined}
       tabIndex={onOpen ? 0 : undefined}
-      aria-label={onOpen ? `View details for ${item.name}` : undefined}
+      aria-label={onOpen ? `View details for ${item.product_name}` : undefined}
     >
       <div className="item-card__media">
-        {item.imageUrl && (
+        {item.thumbnail_url && (
           <img
             className={`item-card__image ${imageStatus === 'loaded' ? 'is-visible' : ''}`}
-            src={item.imageUrl}
-            alt={item.name}
+            src={item.thumbnail_url}
+            alt={item.product_name}
             onLoad={() => setImageStatus('loaded')}
             onError={() => setImageStatus('error')}
           />
@@ -85,20 +85,20 @@ export default function ItemCard({
         {item.badges?.length > 0 && (
           <div className="item-card__badges">
             {item.badges.slice(0, 2).map((badge) => (
-              <Badge bg="warning" text="dark" key={`${item.id}-${badge}`}>
+              <Badge bg="warning" text="dark" key={`${item.product_id}-${badge}`}>
                 {badge}
               </Badge>
             ))}
           </div>
         )}
 
-        <Card.Title className="item-card__title">{item.name}</Card.Title>
+        <Card.Title className="item-card__title">{item.product_name}</Card.Title>
         {item.description && <Card.Text className="item-card__description">{item.description}</Card.Text>}
         <Card.Text className="item-card__price">
-          {item.mrp && item.mrp > item.unitPrice && (
+          {item.mrp && item.mrp > item.selling_price && (
             <span className="item-card__mrp">${item.mrp.toFixed(2)}</span>
           )}
-          <strong>${item.unitPrice.toFixed(2)}</strong>
+          <strong>${item.selling_price.toFixed(2)}</strong>
         </Card.Text>
       </Card.Body>
       <Card.Footer className="item-card__footer">

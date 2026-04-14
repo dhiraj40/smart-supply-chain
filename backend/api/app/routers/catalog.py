@@ -4,7 +4,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from app.shared.utils import database as db
 from app.auth.dept import get_current_user
-from app.schemas.response.catalog import ProductReviewResponse, ProductSummaryResponse, ProductImageResponse
+from app.schemas.response.catalog import ProductReviewResponse, ProductSummaryResponse, ProductImageResponse, ListProductsResponse
 
 
 router = APIRouter(
@@ -18,12 +18,13 @@ router = APIRouter(
 # def get_home():
 #     return get_home_layout()
 
-@router.get("/page={page}&page_size={page_size}", response_model=List[ProductSummaryResponse])
+@router.get("/page={page}&page_size={page_size}", response_model=ListProductsResponse)
 def list_products(page: int, page_size: int):
     products = db.getProducts(
         page = page,
         page_size=page_size
     )
+    totalCount = db.getTotalProductCount()
     product_summaries = [
         ProductSummaryResponse(
             product_id=prod["product_id"],
@@ -45,7 +46,7 @@ def list_products(page: int, page_size: int):
         )
         for prod in products
     ]
-    return product_summaries
+    return ListProductsResponse(products=product_summaries, totalCount=totalCount)
 
 
 @router.get("/{slug}", response_model=List[ProductSummaryResponse])

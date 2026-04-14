@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     products: [],
+    totalProductsCount: 0,
     selectedProduct: {
         details: null,
         images: [],
@@ -10,11 +11,18 @@ const initialState = {
 };
 
 const productSlice = createSlice({
-    name: "product",
+    name: "products",
     initialState,
     reducers: {
         setProducts: (state, action) => {
-            state.products = action.payload;
+            if (Array.isArray(action.payload)) {
+                state.products = action.payload;
+                state.totalProductsCount = action.payload.length;
+                return;
+            }
+
+            state.products = action.payload?.products || [];
+            state.totalProductsCount = action.payload?.totalCount || 0;
         },
         setSelectedProductDetails: (state, action) => {
             state.selectedProduct.details = action.payload;

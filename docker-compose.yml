@@ -133,6 +133,19 @@ services:
     depends_on:
       - fastapi
 
+  frontend-delivery-app:
+    build: ./frontend/delivery-app
+    container_name: react-frontend-delivery-app
+    ports:
+      - "3005:3000"
+    volumes:
+      - ./frontend/delivery-app:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - fastapi
+
 volumes:
   zookeeper-data:
   zookeeper-log:

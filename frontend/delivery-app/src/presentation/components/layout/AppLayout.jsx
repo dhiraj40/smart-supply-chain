@@ -1,4 +1,4 @@
-import '../../../theme/theme.css'
+import '../../theme/theme.css'
 import Topbar from './Topbar'
 import Sidebar from './Sidebar'
 import Footer from './Footer'
