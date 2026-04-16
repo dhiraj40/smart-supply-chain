@@ -98,7 +98,7 @@ export default function ItemCard({
           {item.mrp && item.mrp > item.selling_price && (
             <span className="item-card__mrp">${item.mrp.toFixed(2)}</span>
           )}
-          <strong>${item.selling_price.toFixed(2)}</strong>
+          <strong>${item.selling_price?.toFixed(2)}</strong>
         </Card.Text>
       </Card.Body>
       <Card.Footer className="item-card__footer">

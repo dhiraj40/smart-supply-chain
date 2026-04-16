@@ -1,12 +1,15 @@
 
-import { orderRepository } from './orderRepository';
-import { productRepository } from './productRepository';
-import { authRepository } from './authRepository';
+import { orderRepository, mockOrderRepository } from './orderRepository';
+import { productRepository, mockProductRepository } from './productRepository';
+import { authRepository, mockAuthRepository } from './authRepository';
 
 export const repositories = (httpClient, dispatch) => {
+    const env = (process.env.REACT_APP_ENVIRONMENT || process.env.ENVIRONMENT || "").trim();
+    const useMock = ["MOCK", "mock", "Mock"].includes(env) || (process.env.NODE_ENV === 'development' && env === '');
+    console.log("repositories env=", env, "useMock=", useMock);
     return {
-        orderRepository: orderRepository(httpClient, dispatch),
-        productRepository: productRepository(httpClient, dispatch),
-        authRepository: authRepository(httpClient, dispatch)
+        orderRepository: useMock ? mockOrderRepository(dispatch) : orderRepository(httpClient, dispatch),
+        productRepository: useMock ? mockProductRepository(dispatch) : productRepository(httpClient, dispatch),
+        authRepository: useMock ? mockAuthRepository(dispatch) : authRepository(httpClient, dispatch),
     };
 };
