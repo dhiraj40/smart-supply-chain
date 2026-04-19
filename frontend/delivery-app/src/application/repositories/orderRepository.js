@@ -32,16 +32,18 @@ export const orderRepository = (httpClient, dispatch) => {
     const placeOrder = async (order) => {
         const response = await httpClient(`${ORDERS_ROUTE}/create_order`, {
             method: 'POST',
-            data: order
+            body: order
         });
-        return response.data;
+        return response;
     }
 
     const getOrderHistory = async () => {
+        console.log("API call to ", ORDERS_ROUTE)
         const response = await httpClient(`${ORDERS_ROUTE}/`, {
             method: 'GET',
         });
-        dispatch(setOrderHistory(response.data));
+        // console.log(response[0].order_status)
+        dispatch(setOrderHistory(response));
     }
 
     const getSelectedOrderItems = async (selectedOrder) => {
@@ -50,7 +52,7 @@ export const orderRepository = (httpClient, dispatch) => {
             method: 'GET',
         });
 
-        dispatch(setSelectedOrderedItems(response.data));
+        dispatch(setSelectedOrderedItems(response));
     }
 
     return {

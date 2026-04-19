@@ -1,5 +1,14 @@
-import { useState } from "react";
-import { Accordion, Badge, Table, Container, Pagination } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import {
+  Accordion,
+  Badge,
+  Table,
+  Container,
+  Pagination,
+} from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { repositories } from "../../application/repositories";
+import { apiClient } from "../../application/api/client";
 
 const createMockOrder = (index, status) => {
   const baseDate = new Date("2026-04-01");
@@ -30,21 +39,30 @@ const createMockOrder = (index, status) => {
     quantity: item.quantity + (itemIndex % 2),
   }));
 
-  const total = items.reduce((sum, item) => sum + item.quantity * item.price, 0);
+  const total = items.reduce(
+    (sum, item) => sum + item.quantity * item.price,
+    0,
+  );
 
   return {
-    orderId: `ORD-${1000 + index}`,
-    date: formattedDate,
-    status,
+    order_id: `ORD-${1000 + index}`,
+    created_at: formattedDate,
+    order_status: status,
     total: Number(total.toFixed(2)),
     items,
   };
 };
 
 const mockOrders = [
-  ...Array.from({ length: 25 }, (_, index) => createMockOrder(index + 1, "Delivered")),
-  ...Array.from({ length: 25 }, (_, index) => createMockOrder(index + 1 + 25, "In Transit")),
-  ...Array.from({ length: 25 }, (_, index) => createMockOrder(index + 1 + 50, "Processing")),
+  ...Array.from({ length: 25 }, (_, index) =>
+    createMockOrder(index + 1, "Delivered"),
+  ),
+  ...Array.from({ length: 25 }, (_, index) =>
+    createMockOrder(index + 1 + 25, "In Transit"),
+  ),
+  ...Array.from({ length: 25 }, (_, index) =>
+    createMockOrder(index + 1 + 50, "Processing"),
+  ),
 ];
 
 const statusVariant = (status) => {
@@ -61,10 +79,14 @@ const statusVariant = (status) => {
 };
 
 const AccordionOrderWrapper = ({ orders, activeKey, onSelect }) => {
+  // console.log("Accordance Wrapper ", orders)
   const [page, setPage] = useState(0);
   const pageSize = 10;
   const pageCount = Math.max(1, Math.ceil(orders.length / pageSize));
-  const visibleOrders = orders.slice(page * pageSize, page * pageSize + pageSize);
+  const visibleOrders = orders.slice(
+    page * pageSize,
+    page * pageSize + pageSize,
+  );
 
   const handlePageChange = (newPage) => {
     if (newPage >= 0 && newPage < pageCount) {
@@ -76,18 +98,18 @@ const AccordionOrderWrapper = ({ orders, activeKey, onSelect }) => {
     <>
       <Accordion activeKey={activeKey} onSelect={onSelect}>
         {visibleOrders.map((order, index) => (
-          <Accordion.Item eventKey={`${index}`} key={order.orderId}>
+          <Accordion.Item eventKey={`${index}`} key={order.order_id}>
             <Accordion.Header>
               <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start w-100">
                 <div>
-                  <strong>{order.orderId}</strong>
-                  <div className="text-muted">{order.date}</div>
+                  <strong>{order.order_id}</strong>
+                  <div className="text-muted">{order.created_at}</div>
                 </div>
                 <div className="text-sm-end mt-2 mt-sm-0">
-                  <Badge bg={statusVariant(order.status)} className="me-2">
-                    {order.status}
+                  <Badge bg={statusVariant(order.order_status)} className="me-2">
+                    {order.order_status}
                   </Badge>
-                  <div className="fw-semibold">${order.total.toFixed(2)}</div>
+                  <div className="fw-semibold">${order.order_amount.toFixed(2)}</div>
                 </div>
               </div>
             </Accordion.Header>
@@ -103,7 +125,7 @@ const AccordionOrderWrapper = ({ orders, activeKey, onSelect }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {order.items.map((item) => (
+                  {order?.items?.map((item) => (
                     <tr key={item.sku}>
                       <td>{item.sku}</td>
                       <td>{item.name}</td>
@@ -124,7 +146,10 @@ const AccordionOrderWrapper = ({ orders, activeKey, onSelect }) => {
       {pageCount > 1 && (
         <div className="d-flex justify-content-center mt-3">
           <Pagination>
-            <Pagination.Prev onClick={() => handlePageChange(page - 1)} disabled={page === 0} />
+            <Pagination.Prev
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 0}
+            />
             {Array.from({ length: pageCount }, (_, index) => (
               <Pagination.Item
                 key={index}
@@ -134,7 +159,10 @@ const AccordionOrderWrapper = ({ orders, activeKey, onSelect }) => {
                 {index + 1}
               </Pagination.Item>
             ))}
-            <Pagination.Next onClick={() => handlePageChange(page + 1)} disabled={page === pageCount - 1} />
+            <Pagination.Next
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === pageCount - 1}
+            />
           </Pagination>
         </div>
       )}
@@ -148,8 +176,31 @@ const OrderPage = () => {
   const [activeKey2, setActiveKey2] = useState("0");
   const [activeKey3, setActiveKey3] = useState("0");
 
+  let dispatch = useDispatch();
+
+  const orderStore = useSelector((state) => state.order)
+  const orderHistory = orderStore.orderHistory;
+  const orderRepository = repositories(apiClient, dispatch).orderRepository;
+
+  useEffect(() => {
+    orderRepository.getOrderHistory();
+  }, []);
+
+  useEffect(()=>{
+    
+  }, [activeKey1, activeKey2, activeKey3])
+
+  useEffect(()=>{
+    console.log("orderHistoryFiltered: ", orderHistory?.filter(item=>item.order_status==='created'))
+  }, [orderHistory])
+
   const activeKeySelectHandler = (key) => {
     setActiveKey(key);
+  };
+
+  const activeKey1SelectHandler = (key) => {
+    console.log('activeKey1SelectHandler: ', key)
+    setActiveKey1(key);
   };
 
   return (
@@ -160,11 +211,14 @@ const OrderPage = () => {
             <h1>Order Processing</h1>
           </Accordion.Header>
           <Accordion.Body>
-            <AccordionOrderWrapper
-              orders={mockOrders.filter((item) => item.status === 'Delivered')}
-              activeKey={activeKey1}
-              onSelect={(key) => setActiveKey1(key)}
-            />
+            {
+            (
+              <AccordionOrderWrapper
+                orders={orderHistory?.filter(item=>item.order_status==='created')}
+                activeKey={activeKey1}
+                onSelect={activeKey1SelectHandler}
+              />
+            )}
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="1">
@@ -172,11 +226,14 @@ const OrderPage = () => {
             <h1>Order In Transit</h1>
           </Accordion.Header>
           <Accordion.Body>
-            <AccordionOrderWrapper
-              orders={mockOrders.filter((item) => item.status === 'In Transit')}
-              activeKey={activeKey2}
-              onSelect={(key) => setActiveKey2(key)}
-            />
+            {orderHistory &
+            (
+              <AccordionOrderWrapper
+                orders={orderHistory?.filter(item=>item.order_status==='created')}
+                activeKey={activeKey2}
+                onSelect={(key) => setActiveKey2(key)}
+              />
+            )}
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="2">
@@ -184,11 +241,14 @@ const OrderPage = () => {
             <h1>Order History</h1>
           </Accordion.Header>
           <Accordion.Body>
-            <AccordionOrderWrapper
-              orders={mockOrders.filter((item) => item.status === 'Processing')}
-              activeKey={activeKey3}
-              onSelect={(key) => setActiveKey3(key)}
-            />
+            {orderHistory &
+            (
+              <AccordionOrderWrapper
+                orders={orderHistory?.filter(item=>item.order_status==='created')}
+                activeKey={activeKey3}
+                onSelect={(key) => setActiveKey3(key)}
+              />
+            )}
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>

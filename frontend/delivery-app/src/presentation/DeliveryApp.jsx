@@ -4,17 +4,19 @@ import LoginPage from "./pages/LoginPage";
 import { ListGroup, Button, Badge } from "react-bootstrap";
 import { useState } from "react";
 import OrderPage from "./pages/OrderPage";
+import Cart from "./pages/Cart";
 import SettingPage from "./pages/SettingPage";
 import AppLayout from "./components/layout/AppLayout";
 
 const PAGES = {
   DASHBOARD: "DASHBOARD",
-  CART: "CART",
+  ORDER: "ORDER",
   SETTINGS: "SETTINGS",
 };
 
 const ActiveDeliveryPage = ({ activePage, setActivePage, user }) => {
   const cartQuantities = useSelector((store) => store.cart?.cart || {});
+  const [showCartModal, setShowCartModal] = useState(false);
   const sidebar = (
     <ListGroup variant="flush">
       <ListGroup.Item
@@ -27,9 +29,9 @@ const ActiveDeliveryPage = ({ activePage, setActivePage, user }) => {
       </ListGroup.Item>
       <ListGroup.Item
         action
-        href="#cart"
-        onClick={() => setActivePage(PAGES.CART)}
-        active={activePage === PAGES.CART}
+        // href="#cart"
+        onClick={() => setActivePage(PAGES.ORDER)}
+        active={activePage === PAGES.ORDER}
       >
         Orders
       </ListGroup.Item>
@@ -48,25 +50,28 @@ const ActiveDeliveryPage = ({ activePage, setActivePage, user }) => {
     <Button
       variant="outline-secondary"
       size="sm"
-      onClick={() => setActivePage(PAGES.CART)}
+      onClick={() => setShowCartModal(true)}
     >
       <span role="img" aria-label="cart" style={{ marginRight: "0.5rem" }}>
         🛒
       </span>
-      Cart <Badge>{Object.values(cartQuantities).reduce((sum, val) => sum + val, 0)}</Badge>
+      View Cart <Badge>{Object.values(cartQuantities).reduce((sum, item) => sum + item.quantity, 0)}</Badge>
     </Button>
   );
 
   return (
-    <AppLayout sidebar={sidebar} topbarRight={topbarRight}>
-      {activePage === PAGES.CART ? (
-        <OrderPage />
-      ) : activePage === PAGES.SETTINGS ? (
-        <SettingPage />
-      ) : (
-        <HomePage user={user} />
-      )}
-    </AppLayout>
+    <>
+      <AppLayout sidebar={sidebar} topbarRight={topbarRight}>
+        {activePage === PAGES.ORDER ? (
+          <OrderPage />
+        ) : activePage === PAGES.SETTINGS ? (
+          <SettingPage />
+        ) : (
+          <HomePage user={user} />
+        )}
+      </AppLayout>
+      <Cart show={showCartModal} onHide={() => setShowCartModal(false)} />
+    </>
   );
 };
 

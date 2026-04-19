@@ -8,15 +8,20 @@ import { addToCart } from "../../storage/stateSlices/cartSlice";
 const HomePage = ({ user }) => {
     const dispatch = useDispatch();
     const productStore = useSelector((store) => store.products || { products: [] });
-    const cartQuantities = useSelector((store) => store.cart?.cart || {});
+    const cartItems = useSelector((store) => store.cart?.cart || {});
     const products = Array.isArray(productStore.products) ? productStore.products : [];
 
     useEffect(() => {
-        repositories(apiClient, dispatch).productRepository.listProducts(1, 25);
+        repositories(apiClient, dispatch).productRepository.listProducts(1, 100);
     }, [dispatch]);
 
     const onAddItem = (item) => {
-        dispatch(addToCart(item.product_id));
+        console.log("onAddItem: ", item)
+        dispatch(addToCart({
+            product_name: item.product_name,
+            product_id: item.product_id,
+            unit_price: Number(item.selling_price)
+        }));
     };
 
     return (
@@ -27,7 +32,7 @@ const HomePage = ({ user }) => {
             </div>
             <GridList 
                 items={products} 
-                quantities={cartQuantities} 
+                cartItems={cartItems} 
                 onAdd={onAddItem}
             />
         </div>

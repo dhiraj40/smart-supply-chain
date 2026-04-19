@@ -9,12 +9,13 @@ const cartSlice = createSlice({
   initialState,
     reducers: {
     addToCart: (state, action) => {
-        const product_id = action.payload;
-        if(state.cart[product_id]===undefined){
-            state.cart[product_id] = 0;
+        const item = action.payload;
+        if(state.cart[item.product_id]===undefined){
+            state.cart[item.product_id] = item
+            state.cart[item.product_id]['quantity'] = 0
         }
 
-        state.cart[product_id] += 1;
+        state.cart[item.product_id].quantity += 1;
     },
     removeFromCart: (state, action) => {
         const product_id = action.payload;
